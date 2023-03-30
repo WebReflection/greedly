@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>greedly</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      height: 100%;
+    }
+    #basic {
+      display: none;  /* will be grid after */
+      width: 100%;
+      height: 100%;
+      margin: auto;
+    }
+    #basic > * {
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 2rem;
+      outline: 1px solid silver;
+      border: 0;
+      transition: all 250ms;
+    }
+    #basic > *:hover {
+      outline: 3px solid silver;
+      z-index: 1;
+    }
+  </style>
+  <script type="module">
+    import greedly from '../index.js';
+    const grid = greedly(`
+      1 2 3
+      4 5 6
+      7 8 9
+    `);
+    grid.applyTo(basic);
+    let i = 0;
+    basic.addEventListener('click', ({target}) => {
+      if (target.textContent === ' ')
+        target.textContent = i++ % 2 ? 'X' : 'O';
+    });
+  </script>
+</head>
+<body>
+  <div id="basic">
+    <button>&nbsp;</button>
+    <button>&nbsp;</button>
+    <button>&nbsp;</button>
+    <button>&nbsp;</button>
+    <button>&nbsp;</button>
+    <button>&nbsp;</button>
+    <button>&nbsp;</button>
+    <button>&nbsp;</button>
+    <button>&nbsp;</button>
+  </div>
+</body>
+</html>

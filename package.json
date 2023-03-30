@@ -1,0 +1,9 @@
+{
+  "name": "greedily",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "keywords": [],
+  "author": "Andrea Giammarchi"
+}
