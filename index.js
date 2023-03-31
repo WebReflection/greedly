@@ -114,28 +114,3 @@ export default layout => {
     }
   };
 };
-
-// BROKEN ⚠  the emoji might fail due multiple combinators.
-//            it's much safer to reason about ASCII chars
-// const normalize = layout => {
-//   let width = 0;
-//   let start = Infinity;
-//   const lines = [];
-//   for (const line of layout.split(/[\r\n]+/)) {
-//     const endLength = [...line.trimEnd()].length;
-//     if (endLength) {
-//       width = max(width, endLength);
-//       start = min(start, [...line].length - [...line.trimStart()].length);
-//       lines.push(line);
-//     }
-//   }
-//   return lines.map(
-//     line => {
-//       const row = [...line].slice(start);
-//       return Array.from(
-//         {length: width - start},
-//         (_, i) => (i < row.length ? row[i] : ' ')
-//       ).join('');
-//     }
-//   ).join('\n');
-// };
