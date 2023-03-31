@@ -5,17 +5,98 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grid Layout</title>
-  <script type="module" src="../grid-layout.js"></script>
-  <script defer src="../grid-layout-editor.js"></script>
+  <script type="module">
+    import '../grid-layout.js';
+    import '../grid-layout-editor.js';
+    layout.querySelector('.apply').onclick = () => {
+      const value = layout.querySelector('textarea').value.trim();
+      if (value)
+        editor.firstElementChild.structure = `\n${value}\n`;
+    };
+    layout.querySelector('.export').onclick = () => {
+      layout.querySelector('.apply').click();
+      preview.replaceChildren(
+        editor.firstElementChild.exportAsComponent(true)
+      );
+    };
+    for (const input of layout.querySelectorAll('[name]')) {
+      input.oninput = ({currentTarget}) => {
+        editor.firstElementChild.setAttribute(currentTarget.name, currentTarget.value);
+      };
+    }
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+    .editor {
+      height: 100%;
+    }
+    .editor > * {
+      padding: 16px;
+    }
+    #layout, #layout textarea {
+      max-width: 220px;
+    }
+    #layout textarea {
+      height: 220px;
+    }
+    #layout > fieldset {
+      margin: 0;
+      height: 100%;
+    }
+    #layout > fieldset label {
+      display: flex;
+      justify-content: end;
+      margin: 4px auto;
+    }
+    #layout > fieldset label input {
+      max-width: 120px;
+      margin-inline-start: 8px;
+    }
+    #editor, #preview {
+      display: flex;
+    }
+    /* for demo sake */
+    #preview > grid-layout {
+      margin: auto;
+    }
+    #preview > grid-layout > * {
+      background-color: hsl(0, 0%, 95%);
+    }
+  </style>
 </head>
 <body>
-  <!--grid-layout>
-  < !--#
-    i i i i i
-          b b
-  -- >
-    <input><input type="button">
-  </grid-layout-->
-  <grid-layout-editor></grid-layout-editor>
+  <grid-layout class="editor">
+    <!--#
+      t e e e e
+      t p p p p
+    -->
+    <div id="layout">
+      <fieldset>
+        <legend>Layout</legend>
+        <textarea></textarea>
+        <button class="apply">Apply</button>
+        <button class="export">Export</button>
+        <hr>
+        <label>
+          <span>Width</span> <input name="width" type="number" value="320">
+        </label>
+        <label>
+          <span>Height</span> <input name="height" type="number" value="320">
+        </label>
+      </fieldset>
+    </div>
+    <div id="editor">
+      <grid-layout-editor></grid-layout-editor>
+    </div>
+    <div id="preview"></div>
+  </grid-layout>
 </body>
 </html>
