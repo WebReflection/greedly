@@ -1,4 +1,4 @@
-from re import split
+from re import match, split, sub
 
 class Grid:
   def __init__(self, ids, layout):
@@ -12,10 +12,10 @@ class Grid:
     style = element.style
     style.display = "grid";
     style["grid-template-areas"] = self.layout
-    for id in self.ids:
-      if known[id] == None:
-        known[id] = children[i]
-        known[id].style["grid-area"] = id
+    for identifier in self.ids:
+      if known[identifier] == None:
+        known[identifier] = children[i]
+        known[identifier].style["grid-area"] = id
         i = i + 1
     return element
 
@@ -23,18 +23,39 @@ class Grid:
     i = 0
     known = []
     output = [selector + "{display:grid;grid-template-areas:" + self.layout + "}"]
-    for id in self.ids:
-      if (id in known) == False:
+    for identifier in self.ids:
+      if (identifier in known) == False:
         i = i + 1
-        output.append(selector + ">*:nth-child(" + str(i) + "){grid-area:" + id + "}")
-        known.append(id)
+        output.append(selector + ">*:nth-child(" + str(i) + "){grid-area:" + identifier + "}")
+        known.append(identifier)
     return "\n".join(output)
 
-def normalize(layout):
+def _add_dot(row, c, p):
+  if c == p:
+    c = ""
+    row.append(".")
+  return c
+
+def _drop_identifiers(layout):
+  index = {"i": 0}
+  placeholders = {}
+  return sub("\S+", lambda m: _get_identifier(placeholders, index, m), layout)
+
+def _get_identifier(placeholders, index, m):
+  identifier = m.group(0)
+  if (identifier in placeholders) == False:
+    c = "\n"
+    while match("[\r\n\t ]", c):
+      c = chr(index["i"])
+      index["i"] = index["i"] + 1
+    placeholders[identifier] = c
+  return placeholders[identifier]
+
+def _normalize(layout):
   width = 0
   start = len(layout)
   lines = []
-  for line in split("[\r\n]+", layout):
+  for line in split("[\r\n]+", _drop_identifiers(layout)):
     endLength = len(line.rstrip())
     if endLength:
       width = max(width, endLength)
@@ -42,29 +63,22 @@ def normalize(layout):
       lines.append(line)
   return "\n".join(map(lambda line: line[start:].ljust(width - start), lines))
 
-
-def add_dot(row, c, p):
-  if c == p:
-    c = ""
-    row.append(".")
-  return c
-
 def grid(layout):
   p = "";
   row = [];
   area = [row];
-  for c in normalize(layout):
+  for c in _normalize(layout):
     match c:
       case " ":
-        p = add_dot(row, c, p)
+        p = _add_dot(row, c, p)
       case "\t":
-        p = add_dot(row, c, p)
+        p = _add_dot(row, c, p)
       case "\n":
         row = []
         area.append(row)
       case _:
         p = c
-        row.append("g" + c)
+        row.append("g" + str(ord(c)))
   ids = filter(
     lambda id: id != ".",
     [identifier for row in area for identifier in row]
@@ -73,12 +87,13 @@ def grid(layout):
   return Grid(ids, layout)
 
 # example
-print(
-  grid(
-    """
-      h h h
-      m m n
-      f f f
-    """
-  ).css_for(".my-page")
-)
+if __name__ == "__main__":
+  print(
+    grid("""
+      🔢 🔢 🔢 ➗
+      7️⃣ 8️⃣ 9️⃣ ✖
+      4️⃣ 5️⃣ 6️⃣ ➖
+      1️⃣ 2️⃣ 3️⃣ ➕
+      0️⃣ ⚪ 🆗 ➕
+    """).css_for(".my-page")
+  )
