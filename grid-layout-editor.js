@@ -30,11 +30,17 @@ customElements.whenDefined('grid-layout').then(
         }
       `;
       customElements.define('grid-layout-editor', class extends GridLayout {
+        // Custom Elements related
         static observedAttributes = ['width', 'height'];
         attributeChangedCallback(name, _, value) {
           this.style.setProperty(name, value.replace(/^(\d+)$/, '$1px'));
         }
+        connectedCallback() {
+          if (!this.structure)
+            this.reset();
+        }
 
+        // GridLayout override
         /** @type {string} */
         get structure() {
           return super.structure;
@@ -56,9 +62,27 @@ customElements.whenDefined('grid-layout').then(
           super.structure = data;
         }
 
-        connectedCallback() {
-          if (!this.structure)
-            this.reset();
+        // extra features
+        exportAsComponent(enforceWidth = false) {
+          const {children, structure} = this;
+          const gl = document.createElement('grid-layout');
+          const childNodes = [document.createComment('#' + structure)];
+          if (enforceWidth) {
+            const {width, height} = getComputedStyle(this);
+            Object.assign(gl.style, {width, height});
+          }
+          for (const {firstElementChild} of children) {
+            if (firstElementChild)
+              childNodes.push(firstElementChild.cloneNode(true));
+            else
+              childNodes.push(document.createElement('div'));
+          }
+          gl.append(...childNodes);
+          return gl;
+        }
+
+        exportAsHTML(enforceWidth = false) {
+          return this.exportAsComponent(enforceWidth).outerHTML;
         }
 
         reset() {

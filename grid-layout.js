@@ -3,12 +3,6 @@ import greedily from './index.js';
 if (!customElements.get('grid-layout')) {
   const {COMMENT_NODE} = Node;
   const {find} = Array.prototype;
-  const applyGridLayout = records => {
-    for (const {target} of records) {
-      if (isGridComment(target))
-        greedily(target.data.slice(1)).applyTo(target.parentElement);
-    }
-  };
   const isGridComment = target => {
     return target.nodeType === COMMENT_NODE && target.data.startsWith('#');
   };
