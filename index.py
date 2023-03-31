@@ -13,10 +13,10 @@ class Grid:
     style.display = "grid";
     style["grid-template-areas"] = self.layout
     for identifier in self.ids:
-      if known[identifier] == None:
+      if (identifier in known) == False:
         known[identifier] = children[i]
-        known[identifier].style["grid-area"] = id
-        i = i + 1
+        known[identifier].style["grid-area"] = identifier
+        i += 1
     return element
 
   def css_for(self, selector):
@@ -25,7 +25,7 @@ class Grid:
     output = [selector + "{display:grid;grid-template-areas:" + self.layout + "}"]
     for identifier in self.ids:
       if (identifier in known) == False:
-        i = i + 1
+        i += 1
         output.append(selector + ">*:nth-child(" + str(i) + "){grid-area:" + identifier + "}")
         known.append(identifier)
     return "\n".join(output)
@@ -47,7 +47,7 @@ def _get_identifier(placeholders, index, m):
     c = "\n"
     while match("[\r\n\t ]", c):
       c = chr(index["i"])
-      index["i"] = index["i"] + 1
+      index["i"] += 1
     placeholders[identifier] = c
   return placeholders[identifier]
 
