@@ -1,4 +1,25 @@
 const {max, min} = Math;
+const {fromCharCode} = String;
+
+/**
+ * Remove any sequence of chars to normalize identifiers as single char,
+ * allowing also the usage of combined emoji as grid placeholders.
+ * @param {string} layout 
+ * @returns {string}
+ */
+const dropIdentifiers = layout => {
+  let i = 0;
+  const placeholders = new Map;
+  return layout.replace(/\S+/g, id => {
+    if (!placeholders.has(id)) {
+      let c = '';
+      do { c = fromCharCode(i++); }
+      while (/[\r\n\t ]/.test(c));
+      placeholders.set(id, c);
+    }
+    return placeholders.get(id);
+  });
+};
 
 /**
  * Parse a generic string to understand the underlying grid.
@@ -9,7 +30,7 @@ const normalize = layout => {
   let width = 0;
   let start = Infinity;
   const lines = [];
-  for (const line of layout.split(/[\r\n]+/)) {
+  for (const line of dropIdentifiers(layout).split(/[\r\n]+/)) {
     const endLength = line.trimEnd().length;
     if (endLength) {
       width = max(width, endLength);
@@ -48,8 +69,7 @@ export default layout => {
         break;
       default:
         p = c;
-        // use unique identifiers and allow emoji too (or any other special char)
-        row.push('g' + c.split('').map(c => c.charCodeAt(0).toString(36)).join('-'));
+        row.push('g' + c.charCodeAt(0));
         break;
     }
   }
